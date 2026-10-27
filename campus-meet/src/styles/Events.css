@@ -1,0 +1,111 @@
+.events-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  color: #172033;
+  font-family: Arial, sans-serif;
+}
+
+.events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.events-title {
+  margin: 0;
+  font-size: 30px;
+}
+
+.events-subtitle {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+.events-back-button {
+  padding: 10px 16px;
+  background: #ffffff;
+  color: #0878f9;
+  border: 1px solid #0878f9;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.events-notice {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: #eaf3ff;
+  color: #0759b5;
+  border-radius: 6px;
+}
+
+.events-empty {
+  padding: 40px 24px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.event-club {
+  color: #0878f9;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.event-title {
+  margin: 12px 0 18px;
+  font-size: 20px;
+}
+
+.event-detail {
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.event-attendees {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.event-rsvp-button,
+.event-cancel-button {
+  width: 100%;
+  padding: 11px;
+  margin-top: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.event-rsvp-button {
+  background: #0878f9;
+  color: #ffffff;
+  border: none;
+}
+
+.event-rsvp-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.event-cancel-button {
+  background: #ffffff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
