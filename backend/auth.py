@@ -3,13 +3,13 @@ import os
 import re
 from datetime import datetime, timedelta, timezone
 
-import jwt
+import jwt # pyright: ignore[reportMissingImports]
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from mysql.connector import Error, IntegrityError
 from pydantic import BaseModel, Field, field_validator
-from pwdlib import PasswordHash
+from pwdlib import PasswordHash # pyright: ignore[reportMissingImports]
 
 from database import get_connection
 

@@ -1,8 +1,11 @@
 
 import { useEffect, useState } from "react";
-import api from "./api/axios";
-import "./Dashboard.css";
-import "./styles/cards.css";
+
+import api from "../api/axios";
+
+import "../styles/Dashboard.css";
+
+import "../styles/cards.css";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -15,8 +18,7 @@ export default function Dashboard() {
   const [notice, setNotice] = useState("");
   const [actionClubId, setActionClubId] = useState(null);
 
-  const requestedAdminPage = window.location.pathname === "/admin";
-
+  // Load clubs and student information.
   useEffect(() => {
     let cancelled = false;
 
@@ -26,18 +28,19 @@ export default function Dashboard() {
       // Load clubs for both logged-in and logged-out visitors.
       try {
         const clubsResponse = await api.get("/api/clubs");
+
         const receivedClubs = Array.isArray(clubsResponse.data)
           ? clubsResponse.data
           : [];
 
         if (!cancelled) {
-            const uniqueClubs = Array.from(
+          const uniqueClubs = Array.from(
             new Map(
-                receivedClubs.map((club) => [club.ClubID, club])
+              receivedClubs.map((club) => [club.ClubID, club])
             ).values()
-            );
+          );
 
-            setClubs(uniqueClubs);
+          setClubs(uniqueClubs);
         }
       } catch (error) {
         if (!cancelled) {
@@ -49,92 +52,67 @@ export default function Dashboard() {
 
       const token = localStorage.getItem("access_token");
 
-      // Admin pages require authentication.
+      // Visitors can browse clubs without logging in.
       if (!token) {
-        if (requestedAdminPage) {
-          window.location.replace("/dashboard");
-          return;
-        }
-
         setLoading(false);
         return;
       }
 
+      // Load logged-in student information and memberships.
       try {
-        const response = await api.get("/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const [
+          userResponse,
+          summaryResponse,
+          membershipsResponse,
+        ] = await Promise.all([
+          api.get("/api/auth/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
 
-        const data = response.data?.user ?? response.data;
+          api.get("/api/dashboard/user-summary", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+
+          api.get("/api/dashboard/my-memberships", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
+
+        if (cancelled) return;
+
+        const data = userResponse.data?.user ?? userResponse.data;
 
         const currentUser = {
           ...data,
+
           FirstName:
             data.FirstName ??
             data.first_name ??
             data.firstName ??
             data.firstname ??
             "",
+
           LastName:
             data.LastName ??
             data.last_name ??
             data.lastName ??
             data.lastname ??
             "",
-          Role: data.Role ?? data.role ?? "User",
         };
 
-        if (cancelled) return;
-
         setUser(currentUser);
+        setSummary(summaryResponse.data);
+        setMemberships(membershipsResponse.data);
 
-        // Keep users on the dashboard that matches their role.
-        if (requestedAdminPage && currentUser.Role !== "Admin") {
-          window.location.replace("/dashboard");
-          return;
-        }
-
-        if (!requestedAdminPage && currentUser.Role === "Admin") {
-          window.location.replace("/admin");
-          return;
-        }
-
-        if (currentUser.Role === "Admin") {
-          const adminResponse = await api.get(
-            "/api/dashboard/admin-summary",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          if (!cancelled) {
-            setSummary(adminResponse.data);
-          }
-        } else {
-          const [summaryResponse, membershipsResponse] = await Promise.all([
-            api.get("/api/dashboard/user-summary", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            api.get("/api/dashboard/my-memberships", {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-          ]);
-
-          if (!cancelled) {
-            setSummary(summaryResponse.data);
-            setMemberships(membershipsResponse.data);
-          }
-        }
       } catch (error) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("user");
-
-        if (requestedAdminPage) {
-          window.location.replace("/dashboard");
-          return;
-        }
 
         if (!cancelled) {
           setUser(null);
@@ -153,95 +131,116 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [requestedAdminPage]);
+  }, []);
 
+  // Log out.
   function logOut() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     window.location.href = "/";
   }
 
-  
-async function refreshMemberships() {
-  const token = localStorage.getItem("access_token");
+  // Refresh student memberships after joining or leaving a club.
+  async function refreshMemberships() {
+    const token = localStorage.getItem("access_token");
 
-  const [summaryResponse, membershipsResponse] = await Promise.all([
-    api.get("/api/dashboard/user-summary", {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    api.get("/api/dashboard/my-memberships", {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-  ]);
+    const [summaryResponse, membershipsResponse] = await Promise.all([
+      api.get("/api/dashboard/user-summary", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
 
-  setSummary(summaryResponse.data);
-  setMemberships(membershipsResponse.data);
-}
+      api.get("/api/dashboard/my-memberships", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
 
-async function handleJoinClub(clubId) {
-  const token = localStorage.getItem("access_token");
-
-  if (!token || !user) {
-    setNotice("Please log in or register to join a club.");
-    return;
+    setSummary(summaryResponse.data);
+    setMemberships(membershipsResponse.data);
   }
 
-  setActionClubId(clubId);
-  setNotice("");
-
-  try {
-    const response = await api.post(
-      `/api/clubs/${clubId}/join`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    await refreshMemberships();
-    setNotice(response.data.message || "Club membership updated.");
-  } catch (error) {
-    setNotice(
-      error.response?.data?.detail || "Could not join this club. Please try again."
-    );
-  } finally {
-    setActionClubId(null);
-  }
-}
-
-    async function handleLeaveClub(clubId) {
+  // Join a club.
+  async function handleJoinClub(clubId) {
     const token = localStorage.getItem("access_token");
 
     if (!token || !user) {
-        setNotice("Please log in to manage your memberships.");
-        return;
+      setNotice("Please log in or register to join a club.");
+      return;
     }
 
     setActionClubId(clubId);
     setNotice("");
 
     try {
-        const response = await api.post(
+      const response = await api.post(
+        `/api/clubs/${clubId}/join`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await refreshMemberships();
+
+      setNotice(response.data.message || "Club membership updated.");
+    } catch (error) {
+      setNotice(
+        error.response?.data?.detail ||
+          "Could not join this club. Please try again."
+      );
+    } finally {
+      setActionClubId(null);
+    }
+  }
+
+  // Leave a club.
+  async function handleLeaveClub(clubId) {
+    const token = localStorage.getItem("access_token");
+
+    if (!token || !user) {
+      setNotice("Please log in to manage your memberships.");
+      return;
+    }
+
+    setActionClubId(clubId);
+    setNotice("");
+
+    try {
+      const response = await api.post(
         `/api/clubs/${clubId}/leave`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
-        );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        await refreshMemberships();
-        setNotice(response.data.message || "You have left the club.");
+      await refreshMemberships();
+
+      setNotice(response.data.message || "You have left the club.");
     } catch (error) {
-        setNotice(
-        error.response?.data?.detail || "Could not leave this club. Please try again."
-        );
+      setNotice(
+        error.response?.data?.detail ||
+          "Could not leave this club. Please try again."
+      );
     } finally {
-        setActionClubId(null);
+      setActionClubId(null);
     }
-    }
+  }
 
-
+  // Available club categories.
   const categories = [
     "All",
     ...new Set(clubs.map((club) => club.Category).filter(Boolean)),
   ];
 
+  // Search and filter clubs.
   const filteredClubs = clubs.filter((club) => {
     const clubName = club.ClubName || "";
     const description = club.Description || "";
@@ -256,6 +255,7 @@ async function handleJoinClub(clubId) {
     return matchesSearch && matchesCategory;
   });
 
+  // Only show active memberships.
   const activeMemberships = memberships.filter(
     (membership) => membership.MembershipStatus === "Active"
   );
@@ -270,6 +270,8 @@ async function handleJoinClub(clubId) {
 
   return (
     <div className="dashboard-page">
+
+      {/* Header */}
       <header className="dashboard-header">
         <a className="dashboard-brand" href="/dashboard">
           CampusMeet
@@ -281,11 +283,9 @@ async function handleJoinClub(clubId) {
           </a>
 
           {user ? (
-            <>
-              <button className="account-button" onClick={logOut}>
-                Log out
-              </button>
-            </>
+            <button className="account-button" onClick={logOut}>
+              Log out
+            </button>
           ) : (
             <a className="account-button" href="/">
               Log in
@@ -295,6 +295,8 @@ async function handleJoinClub(clubId) {
       </header>
 
       <main className="dashboard-content">
+
+        {/* Welcome section */}
         <section className="welcome-section">
           <p className="section-eyebrow">
             {user ? "YOUR CAMPUS COMMUNITY" : "WELCOME TO CAMPUSMEET"}
@@ -311,7 +313,6 @@ async function handleJoinClub(clubId) {
               ? "Explore clubs and keep track of your memberships."
               : "Browse university clubs and find communities that interest you. Log in to access membership features."}
           </p>
-          
 
           {!user && (
             <a className="primary-button" href="/">
@@ -320,6 +321,7 @@ async function handleJoinClub(clubId) {
           )}
         </section>
 
+        {/* Notifications */}
         {notice && (
           <div className="dashboard-notice" role="status">
             <p>{notice}</p>
@@ -339,56 +341,28 @@ async function handleJoinClub(clubId) {
           </div>
         )}
 
-        {user && user.Role === "Admin" && summary && (
-          <section className="summary-section">
-            <h2>Overview</h2>
-
-            <div className="summary-grid">
-              <div className="summary-card">
-                <p>Total students</p>
-                <strong>{summary.students ?? 0}</strong>
-              </div>
-
-              <div className="summary-card">
-                <p>Total clubs</p>
-                <strong>{summary.clubs ?? 0}</strong>
-              </div>
-
-              <div className="summary-card">
-                <p>Total memberships</p>
-                <strong>{summary.memberships ?? 0}</strong>
-              </div>
-
-              <div className="summary-card">
-                <p>Total events</p>
-                <strong>{summary.events ?? 0}</strong>
-              </div>
-
-              <div className="summary-card">
-                <p>Pending events</p>
-                <strong>{summary.pending_events ?? 0}</strong>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {user && user.Role !== "Admin" && summary && (
+        {/* Student activity and memberships */}
+        {user && summary && (
           <section className="summary-section">
             <h2>Your activity</h2>
 
             <div className="summary-grid user-summary-grid">
               <div className="summary-card">
                 <p>Active memberships</p>
-                <strong>{summary.active_memberships ?? 0}</strong>
+                <strong>
+                  {summary.active_memberships ?? 0}
+                </strong>
               </div>
             </div>
 
-            <h2 className="subsection-heading">My memberships</h2>
+            <h2 className="subsection-heading">
+              My memberships
+            </h2>
 
             {activeMemberships.length === 0 ? (
               <p className="empty-message">
-                You have not joined any clubs yet. Browse the clubs below to
-                find one that interests you.
+                You have not joined any clubs yet. Browse the clubs below
+                to find one that interests you.
               </p>
             ) : (
               <div className="membership-list">
@@ -399,7 +373,9 @@ async function handleJoinClub(clubId) {
                   >
                     <div>
                       <h3>{membership.ClubName}</h3>
-                      <p>{membership.Category || "University club"}</p>
+                      <p>
+                        {membership.Category || "University club"}
+                      </p>
                     </div>
 
                     <span className="membership-status">
@@ -412,10 +388,14 @@ async function handleJoinClub(clubId) {
           </section>
         )}
 
+        {/* Explore clubs */}
         <section className="clubs-section">
           <div className="clubs-heading">
             <div>
-              <p className="section-eyebrow">FIND YOUR COMMUNITY</p>
+              <p className="section-eyebrow">
+                FIND YOUR COMMUNITY
+              </p>
+
               <h2>Explore clubs</h2>
             </div>
 
@@ -424,6 +404,7 @@ async function handleJoinClub(clubId) {
             </span>
           </div>
 
+          {/* Search and category filters */}
           <div className="club-filters">
             <input
               type="search"
@@ -446,66 +427,70 @@ async function handleJoinClub(clubId) {
             </select>
           </div>
 
+          {/* Club results */}
           {filteredClubs.length === 0 ? (
             <p className="empty-message">
               No clubs match your search.
             </p>
           ) : (
             <div className="club-grid">
-              {filteredClubs.map((club) => (
-                <article className="club-card" key={club.ClubID}>
-                  <p className="club-category">
-                    {club.Category || "University club"}
-                  </p>
+              {filteredClubs.map((club) => {
+                const membership = memberships.find(
+                  (item) =>
+                    Number(item.ClubID) === Number(club.ClubID) &&
+                    item.MembershipStatus === "Active"
+                );
 
-                  <h3>{club.ClubName}</h3>
+                return (
+                  <article
+                    className="club-card"
+                    key={club.ClubID}
+                  >
+                    <p className="club-category">
+                      {club.Category || "University club"}
+                    </p>
 
-                  <p className="club-description">
-                    {club.Description || "Find out more about this club."}
-                  </p>
+                    <h3>{club.ClubName}</h3>
 
-                  {(() => {
-                    const membership = memberships.find(
-                      (item) =>
-                        Number(item.ClubID) === Number(club.ClubID) &&
-                        item.MembershipStatus === "Active"
-                    );
+                    <p className="club-description">
+                      {club.Description ||
+                        "Find out more about this club."}
+                    </p>
 
-                    return (
-                      <div className="club-actions">
-                        {membership ? (
-                          <button
-                            className="club-action"
-                            onClick={() => handleLeaveClub(club.ClubID)}
-                            disabled={actionClubId === club.ClubID}
-                          >
-                            {actionClubId === club.ClubID
+                    <div className="club-actions">
+                      {membership ? (
+                        <button
+                          className="club-action"
+                          onClick={() => handleLeaveClub(club.ClubID)}
+                          disabled={actionClubId === club.ClubID}
+                        >
+                          {actionClubId === club.ClubID
+                            ? "Please wait..."
+                            : "Leave club"}
+                        </button>
+                      ) : (
+                        <button
+                          className="club-action"
+                          onClick={() => handleJoinClub(club.ClubID)}
+                          disabled={!user || actionClubId === club.ClubID}
+                        >
+                          {!user
+                            ? "Log in to join"
+                            : actionClubId === club.ClubID
                               ? "Please wait..."
-                              : "Leave club"}
-                          </button>
-                        ) : (
-                          <button
-                            className="club-action"
-                            onClick={() => handleJoinClub(club.ClubID)}
-                            disabled={!user || actionClubId === club.ClubID}
-                          >
-                            {!user
-                              ? "Log in to join"
-                              : actionClubId === club.ClubID
-                                ? "Please wait..."
-                                : "Join club"}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </article>
-              ))}
+                              : "Join club"}
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
       </main>
 
+      {/* Footer */}
       <footer className="dashboard-footer">
         CampusMeet · University clubs and communities
       </footer>

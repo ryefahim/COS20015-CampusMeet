@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
-import api from "./api/axios";
-import "./styles/Events.css";
+import api from "../api/axios";
+import "../styles/Events.css";
 
 export default function Events() {
   const [events, setEvents] = useState([]);

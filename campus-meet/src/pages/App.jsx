@@ -1,12 +1,17 @@
 
 import { useState } from "react";
-import axios from "./api/axios";
-import "./styles/App.css";
+import axios from "../api/axios";
+import "../styles/App.css";
 import Dashboard from "./Dashboard";
+import AdminDashboard from "./AdminDashboard";
 import Events from "./Events";
+import ClubEngagement from "./reports/ClubEngagement";
+import EventPerformance from "./reports/EventPerformance";
+import ResourceManagement from "./reports/ResourceManagement";
 
 function App() {
   const [page, setPage] = useState("login");
+
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -14,25 +19,46 @@ function App() {
     password: "",
     confirm_password: "",
   });
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  if (
-    window.location.pathname === "/dashboard" ||
-    window.location.pathname === "/admin"
-  ) {
-      return <Dashboard />;
+
+  // Route handling
+  if (window.location.pathname === "/admin") {
+    return <AdminDashboard />;
   }
+
+  if (window.location.pathname === "/dashboard") {
+    return <Dashboard />;
+  }
+
   if (window.location.pathname === "/events") {
     return <Events />;
   }
 
+  if (window.location.pathname === "/admin/reports/club-engagement") {
+    return <ClubEngagement />;
+  }
+
+  if (window.location.pathname === "/admin/reports/event-performance") {
+    return <EventPerformance />;
+  }
+
+  if (window.location.pathname === "/admin/reports/resource-management") {
+    return <ResourceManagement />;
+  }
+
   function handleChange(event) {
-    setForm({ ...form, [event.target.name]: event.target.value });
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     setError("");
     setMessage("");
 
@@ -74,8 +100,10 @@ function App() {
           last_name: form.last_name.trim(),
           email,
         });
+
         setMessage("Account created successfully! You can now log in.");
         setPage("login");
+
         setForm({
           first_name: "",
           last_name: "",
@@ -84,6 +112,7 @@ function App() {
           confirm_password: "",
         });
       } else {
+        // Log in
         const response = await axios.post("/api/auth/login", {
           email,
           password: form.password,
@@ -91,14 +120,32 @@ function App() {
 
         const { access_token, user } = response.data;
 
+        if (!access_token || !user) {
+          setError("Login response is missing user information.");
+          return;
+        }
+
+        // Save authentication information
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("user", JSON.stringify(user));
 
-        window.location.href =
-          user.Role === "Admin" ? "/admin" : "/dashboard";
+        // Check user role
+        const role = String(user.Role ?? user.role ?? "")
+          .trim()
+          .toLowerCase();
+
+        // Redirect based on role
+        if (role === "admin") {
+          window.location.assign("/admin");
+        } else {
+          window.location.assign("/dashboard");
+        }
       }
     } catch (err) {
+      console.error("Authentication error:", err);
+
       const detail = err.response?.data?.detail;
+
       setError(
         Array.isArray(detail)
           ? detail.map((item) => item.msg).join(" ")
@@ -130,6 +177,7 @@ function App() {
           >
             Log in
           </button>
+
           <button
             type="button"
             className={page === "register" ? "active" : ""}
@@ -143,7 +191,10 @@ function App() {
           </button>
         </div>
 
-        <h2>{page === "login" ? "Welcome back!" : "Create your account"}</h2>
+        <h2>
+          {page === "login" ? "Welcome back!" : "Create your account"}
+        </h2>
+
         <p className="subtitle">
           {page === "login"
             ? "Log in to your CampusMeet account."
@@ -157,6 +208,7 @@ function App() {
           {page === "register" && (
             <>
               <label htmlFor="first_name">First name</label>
+
               <input
                 id="first_name"
                 name="first_name"
@@ -168,6 +220,7 @@ function App() {
               />
 
               <label htmlFor="last_name">Last name</label>
+
               <input
                 id="last_name"
                 name="last_name"
@@ -181,6 +234,7 @@ function App() {
           )}
 
           <label htmlFor="email">Email address</label>
+
           <input
             id="email"
             name="email"
@@ -196,11 +250,14 @@ function App() {
                 "Enter an email address in the format text@text.com."
               )
             }
-            onInput={(event) => event.currentTarget.setCustomValidity("")}
+            onInput={(event) =>
+              event.currentTarget.setCustomValidity("")
+            }
             required
           />
 
           <label htmlFor="password">Password</label>
+
           <input
             id="password"
             name="password"
@@ -209,13 +266,16 @@ function App() {
             onChange={handleChange}
             minLength={page === "register" ? 8 : undefined}
             maxLength={128}
-            autoComplete={page === "login" ? "current-password" : "new-password"}
+            autoComplete={
+              page === "login" ? "current-password" : "new-password"
+            }
             required
           />
 
           {page === "register" && (
             <>
               <label htmlFor="confirm_password">Confirm password</label>
+
               <input
                 id="confirm_password"
                 name="confirm_password"
@@ -226,14 +286,18 @@ function App() {
                 autoComplete="new-password"
                 required
               />
+
+              <p className="form-hint">
+                Use at least 8 characters.
+              </p>
             </>
           )}
 
-          {page === "register" && (
-            <p className="form-hint">Use at least 8 characters.</p>
-          )}
-
-          <button className="submit-button" type="submit" disabled={loading}>
+          <button
+            className="submit-button"
+            type="submit"
+            disabled={loading}
+          >
             {loading
               ? "Please wait..."
               : page === "login"
@@ -246,6 +310,7 @@ function App() {
           {page === "login"
             ? "New to CampusMeet?"
             : "Already have an account?"}{" "}
+
           <button
             type="button"
             className="text-button"
