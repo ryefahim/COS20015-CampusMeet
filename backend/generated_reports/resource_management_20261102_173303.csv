@@ -1,0 +1,21 @@
+﻿ResourceID,ResourceName,ResourceType,Quantity,Metadata,ClubID,ClubName,SupplierID,SupplierName,SupplierEmail,SupplierServiceType,TotalBookings,ApprovedBookings,PendingBookings,CancelledBookings,CompletedBookings
+1,Board Games,Games,13,,1,Basketball Club,6,"Fadel, Bergstrom and Jacobi",chuxley5@hp.com,Equipment,3,1,1,1,0
+14,Board Games,Games,12,,4,Film Club,4,"Mayert, Schuster and Marquardt",olegerwood3@phpbb.com,Stationary,0,0,0,0,0
+18,Board Games,Games,4,,4,Film Club,1,Daugherty-Rogahn,vlennard0@ameblo.jp,Stationary,0,0,0,0,0
+4,Camera,Photography,14,"{""tags"": [""Photography"", ""Digital Media""], ""specifications"": {""resolution"": ""High Resolution"", ""connectivity"": [""USB"", ""Wi-Fi""]}}",1,Basketball Club,5,Greenfelder Inc,rkosiada4@livejournal.com,Stationary,5,2,1,2,0
+15,Camera,Photography,15,,5,Chess Club,1,Daugherty-Rogahn,vlennard0@ameblo.jp,Stationary,0,0,0,0,0
+7,Chairs,Furniture,5,,8,Photography Club,5,Greenfelder Inc,rkosiada4@livejournal.com,Stationary,2,1,0,0,1
+9,Chairs,Furniture,15,,4,Film Club,3,Prosacco LLC,bstaddom2@storify.com,Food,1,0,0,0,1
+10,Chairs,Furniture,14,,1,Basketball Club,8,Cummerata-Wehner,ekemitt7@hexun.com,Food,1,0,0,0,1
+20,Chairs,Furniture,10,,1,Basketball Club,6,"Fadel, Bergstrom and Jacobi",chuxley5@hp.com,Equipment,0,0,0,0,0
+8,Laptop,Technology,13,"{""tags"": [""Computing"", ""Technology""], ""specifications"": {""portable"": true, ""operating_system"": ""Windows""}}",7,Football Club,8,Cummerata-Wehner,ekemitt7@hexun.com,Food,4,2,2,0,0
+12,Laptop,Technology,2,,4,Film Club,6,"Fadel, Bergstrom and Jacobi",chuxley5@hp.com,Equipment,0,0,0,0,0
+17,Laptop,Technology,6,,10,Programming Club,3,Prosacco LLC,bstaddom2@storify.com,Food,0,0,0,0,0
+19,Laptop,Technology,9,,6,Art Club,2,Jones Inc,ahalcro1@youku.com,Equipment,0,0,0,0,0
+2,Microphone,Audio,2,,4,Film Club,4,"Mayert, Schuster and Marquardt",olegerwood3@phpbb.com,Stationary,3,1,2,0,0
+3,Microphone,Audio,8,,5,Chess Club,5,Greenfelder Inc,rkosiada4@livejournal.com,Stationary,0,0,0,0,0
+5,Microphone,Audio,6,,3,Debate Club,2,Jones Inc,ahalcro1@youku.com,Equipment,0,0,0,0,0
+13,Microphone,Audio,15,,6,Art Club,7,"Hand, Satterfield and Harris",wedeler6@bizjournals.com,Stationary,0,0,0,0,0
+6,Projector,Audio-Visual,9,"{""tags"": [""Presentation"", ""Display""], ""specifications"": {""resolution"": ""1080p"", ""connectivity"": [""HDMI"", ""VGA""]}}",5,Chess Club,3,Prosacco LLC,bstaddom2@storify.com,Food,1,0,1,0,0
+11,Projector,Audio-Visual,1,,3,Debate Club,7,"Hand, Satterfield and Harris",wedeler6@bizjournals.com,Stationary,0,0,0,0,0
+16,Projector,Audio-Visual,8,,1,Basketball Club,7,"Hand, Satterfield and Harris",wedeler6@bizjournals.com,Stationary,0,0,0,0,0

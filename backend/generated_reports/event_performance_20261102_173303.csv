@@ -1,0 +1,16 @@
+﻿EventID,EventName,StartDateTime,EndDateTime,Location,Capacity,Budget,Status,Metadata,ClubID,ClubName,ClubCategory
+104,Basketball Friendly,2026-11-21 13:00:00,2026-11-21 15:00:00,Basketball Court,24,120.00,Approved,,1,Basketball Club,Sports
+106,Debate strategy workshop,2026-11-19 16:53:00,2026-11-19 19:53:00,LateLab,15,0.00,Approved,,3,Debate Club,Academic
+103,Film Screening Night,2026-11-18 18:00:00,2026-11-18 20:30:00,Lecture Theatre 1,50,200.00,Approved,"{""topics"": [""Film"", ""Entertainment""], ""event_type"": ""Screening"", ""registration_required"": true}",4,Film Club,Visual Arts
+102,Volleyball Social,2026-11-14 10:00:00,2026-11-14 12:00:00,Sports Centre,20,100.00,Approved,"{""topics"": [""Volleyball"", ""Teamwork""], ""event_type"": ""Social"", ""registration_required"": false}",9,Volleyball Club,Sports
+101,Programming Workshop,2026-11-10 14:00:00,2026-11-10 16:00:00,Computer Lab 2,30,150.00,Approved,"{""topics"": [""Programming"", ""Technology""], ""event_type"": ""Workshop"", ""registration_required"": true}",10,Programming Club,Academic
+105,test event,2026-11-08 05:33:03,2026-11-08 09:33:03,Library,1,0.00,Pending,,7,Football Club,Sports
+8,Trivia Night,2026-10-10 14:30:00,2026-10-10 16:30:00,Swinburne Library,22,325.02,Pending,,10,Programming Club,Academic
+6,Cultural Festival,2026-09-27 13:00:00,2026-09-27 16:00:00,Swinburne Library,59,239.96,Completed,,5,Chess Club,Academic
+3,Career Panel,2026-09-10 16:30:00,2026-09-10 19:30:00,Swinburne Library,82,371.30,Approved,,5,Chess Club,Academic
+2,Cultural Festival,2026-09-02 11:30:00,2026-09-02 14:30:00,Hawthorn Campus,84,329.43,Pending,,4,Film Club,Visual Arts
+10,Robotics Showcase,2026-08-26 08:30:00,2026-08-26 11:30:00,Hawthorn Campus,34,134.96,Cancelled,,3,Debate Club,Academic
+7,Robotics Showcase,2026-05-18 16:00:00,2026-05-18 19:00:00,Swinburne Library,72,321.37,Completed,,5,Chess Club,Academic
+4,Trivia Night,2026-04-19 12:00:00,2026-04-19 15:00:00,ATC Building,64,541.04,Cancelled,,7,Football Club,Sports
+1,Trivia Night,2026-04-07 15:30:00,2026-04-07 16:30:00,Swinburne Library,56,258.30,Completed,,1,Basketball Club,Sports
+5,Game Night,2026-03-16 11:30:00,2026-03-16 14:30:00,AMDC Building,25,448.13,Pending,,9,Volleyball Club,Sports

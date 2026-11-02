@@ -8,6 +8,7 @@ import Events from "./Events";
 import ClubEngagement from "./reports/ClubEngagement";
 import EventPerformance from "./reports/EventPerformance";
 import ResourceManagement from "./reports/ResourceManagement";
+import CreateEvent from "./CreateEvent";
 
 function App() {
   const [page, setPage] = useState("login");
@@ -47,6 +48,10 @@ function App() {
 
   if (window.location.pathname === "/admin/reports/resource-management") {
     return <ResourceManagement />;
+  }
+
+  if (window.location.pathname === "/admin/create-event") {
+    return <CreateEvent />;
   }
 
   function handleChange(event) {
