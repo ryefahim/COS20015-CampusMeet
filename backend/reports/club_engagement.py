@@ -6,7 +6,7 @@ from database import get_connection
 from auth import require_admin
 
 router = APIRouter(
-    prefix="/api/club_engagement",
+    prefix="/api/reports",
     tags=["Reports"],
 )
 

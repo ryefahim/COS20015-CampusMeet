@@ -1,3 +1,5 @@
 /node_modules
 package-lock.json
 package.json
+backend_sql_explained.txt
+backend_structure.txt
